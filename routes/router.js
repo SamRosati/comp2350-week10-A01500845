@@ -3,7 +3,7 @@ const userModel = include("models/web_user");
 const crypto = require("crypto");
 const { v4: uuid } = require("uuid");
 const passwordPepper = "SeCretPeppa4MySal+";
-const petModel = include('models/pet');
+const petModel = include("models/pet");
 //const database = include('databaseConnection');
 //const dbModel = include('databaseAccessLayer');
 //const dbModel = include('staticData');
@@ -129,19 +129,41 @@ router.post("/addUser", async (req, res) => {
   }
 });
 
-router.get('/pets', async (req, res) => {
-    console.log("pets page hit");
-    try {
-        // Fetch all pets from the database
-        const pets = await petModel.findAll();
-        
-        // Render the pets.ejs page and pass the data as 'allPets'
-        res.render('pets', { allPets: pets });
-    } catch(ex) {
-        res.render('error', { message: 'Error connecting to MySQL' });
-        console.log("Error fetching pets");
-        console.log(ex);
+router.get("/pets", async (req, res) => {
+  console.log("pets page hit");
+  try {
+    // Fetch all pets from the database
+    const pets = await petModel.findAll();
+
+    // Render the pets.ejs page and pass the data as 'allPets'
+    res.render("pets", { allPets: pets });
+  } catch (ex) {
+    res.render("error", { message: "Error connecting to MySQL" });
+    console.log("Error fetching pets");
+    console.log(ex);
+  }
+});
+
+router.get("/showPets", async (req, res) => {
+  console.log("page hit");
+  try {
+    let userId = req.query.id;
+    const user = await userModel.findByPk(userId);
+    if (user === null) {
+      res.render("error", { message: "Error connecting to MySQL" });
+      console.log("Error connecting to userModel");
+    } else {
+      let pets = await user.getPets();
+      console.log(pets);
+      let owner = await pets[0].getOwner();
+      console.log(owner);
+      res.render("pets", { allPets: pets });
     }
+  } catch (ex) {
+    res.render("error", { message: "Error connecting to MySQL" });
+    console.log("Error connecting to MySQL");
+    console.log(ex);
+  }
 });
 
 module.exports = router;
