@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pets</title>
+    </head>
+<body>
+    <div class="container">
+        <h1 class="title">Pets</h1>
+        
+        <table class="table is-bordered is-striped">
+            <thead>
+                <tr>
+                    <th>Pet Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i=0; i < allPets.length; i++) { %>
+                    <tr>
+                        <td><%= allPets[i].name %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td>There are <%= allPets.length %> pets.</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</body>
+</html>
