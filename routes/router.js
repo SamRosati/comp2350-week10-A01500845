@@ -144,26 +144,38 @@ router.get("/pets", async (req, res) => {
   }
 });
 
-router.get("/showPets", async (req, res) => {
-  console.log("page hit");
-  try {
-    let userId = req.query.id;
-    const user = await userModel.findByPk(userId);
-    if (user === null) {
-      res.render("error", { message: "Error connecting to MySQL" });
-      console.log("Error connecting to userModel");
-    } else {
-      let pets = await user.getPets();
-      console.log(pets);
-      let owner = await pets[0].getOwner();
-      console.log(owner);
-      res.render("pets", { allPets: pets });
+router.get('/showPets', async (req, res) => {
+    console.log("page hit");
+    try {
+        // Grab the user ID from the URL query string
+        let userId = req.query.id;
+        
+        // Find the specific user in the database
+        const user = await userModel.findByPk(userId);
+        
+        if (user === null) {
+            res.render('error', {message: 'Error connecting to MySQL'});
+            console.log("Error connecting to userModel");
+        } else {
+            // Use the Sequelize helper method to get all pets for this specific user
+            let pets = await user.getPets();
+            console.log(pets);
+            
+            // The lab includes this line to test the reverse relationship, 
+            // but I've wrapped it in a safety check so your app doesn't crash if a user has 0 pets!
+            if (pets.length > 0) {
+                let owner = await pets[0].getOwner();
+                console.log(owner);
+            }
+            
+            // Render the pets.ejs page and pass it the specific user's pets
+            res.render('pets', {allPets: pets});
+        }
+    } catch (ex) {
+        res.render('error', {message: 'Error connecting to MySQL'});
+        console.log("Error connecting to MySQL");
+        console.log(ex);
     }
-  } catch (ex) {
-    res.render("error", { message: "Error connecting to MySQL" });
-    console.log("Error connecting to MySQL");
-    console.log(ex);
-  }
 });
 
 module.exports = router;
